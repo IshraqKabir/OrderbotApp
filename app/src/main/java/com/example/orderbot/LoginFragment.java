@@ -1,5 +1,7 @@
 package com.example.orderbot;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -25,11 +28,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class LoginFragment extends Fragment {
     private View rootView;
     private Button loginButton;
     private EditText username, password;
+
+    private JsonObjectRequest jsonObjectRequest;
 
     public LoginFragment() {}
 
@@ -45,49 +51,66 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (username.getText().toString().isEmpty() || password.getText().toString().isEmpty()) {
-                    Toast.makeText(getActivity(), "Please fill in username and password", Toast.LENGTH_SHORT).show();
-                } else {
-                    loginButton.setText("Login in...");
-
-                    HashMap<String, String> params = new HashMap<>();
-                    params.put("username", username.getText().toString());
-                    params.put("password", password.getText().toString());
-
-
-                    String url = "https://orderbot.online/api/auth/login";
-
-                    RequestQueue queue = RequestSingleton.getInstance(getContext()).getRequestQueue();
-
-                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params), new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                Log.d("Login", "access_token " + response.get("access_token"));
-                            } catch (JSONException e) {
-                                Toast.makeText(getContext(), "Some error occurred", Toast.LENGTH_LONG).show();
-                                e.printStackTrace();
-                            }
-
-                            loginButton.setText("Login");
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d("error", "error");
-                            Toast.makeText(getContext(), "Username or password was incorrect", Toast.LENGTH_LONG).show();
-                            loginButton.setText("Login");
-                        }
-                    });
-
-
-                    RequestSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
-                }
+                login();
             }
         });
 
-
         return rootView;
-//        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    private void login() {
+        if (username.getText().toString().isEmpty() || password.getText().toString().isEmpty()) {
+            Toast.makeText(getActivity(), "Please fill in username and password", Toast.LENGTH_SHORT).show();
+        } else {
+            loginButton.setText("Login in...");
+
+            HashMap<String, String> params = new HashMap<>();
+            params.put("username", username.getText().toString());
+            params.put("password", password.getText().toString());
+
+            String url = "https://orderbot.online/api/auth/login";
+
+            RequestQueue queue = RequestSingleton.getInstance(getContext()).getRequestQueue();
+
+            jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params), new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        Log.d("Login", "access_token " + response.get("access_token"));
+
+                        // save access token to shared preferences
+                        Context context = getActivity();
+                        SharedPreferences sharedPreferences = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(getString(R.string.access_token_key), response.get("access_token").toString());
+                        editor.apply();
+                        // done
+                    } catch (JSONException e) {
+                        Toast.makeText(getContext(), "Server Error. Check Internet Connection.", Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
+                    }
+
+                    loginButton.setText("Login");
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("error", "error");
+                    Toast.makeText(getContext(), "Username or password was incorrect", Toast.LENGTH_LONG).show();
+                    loginButton.setText("Login");
+                }
+            });
+
+            RequestSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        if (jsonObjectRequest != null) {
+            jsonObjectRequest.cancel();
+        }
     }
 }
