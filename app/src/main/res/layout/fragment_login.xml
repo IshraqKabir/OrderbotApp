@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frameLayout2"
     android:layout_width="match_parent"
-    android:background="@color/login_container_background"
     android:layout_height="match_parent"
+    android:background="@color/login_container_background"
     tools:context=".LoginFragment">
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
-        android:layout_height="500dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
@@ -20,18 +20,75 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/login_header_border"
-            android:padding="15dp"
-            >
+            android:padding="15dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:text="Login"/>
+                android:text="Login"
+                android:textColor="@color/black" />
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="15dp"
+            android:paddingVertical="15dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Username"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/usernameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/cutom_login_input"
+                android:inputType="text"
+                android:padding="5dp"
+                android:textCursorDrawable="@drawable/login_cursor" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Password"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/passwordInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/cutom_login_input"
+                android:inputType="textPassword"
+                android:padding="5dp"
+                android:textCursorDrawable="@drawable/login_cursor" />
+
+            <Button
+                android:id="@+id/login_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#3490dc"
+                android:text="Login"
+                android:paddingVertical="10dp"
+                android:textAllCaps="false" />
+
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
