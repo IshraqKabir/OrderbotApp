@@ -3,13 +3,17 @@ package com.example.orderbot;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.example.orderbot.ViewModel.AccessTokenViewModel;
+
 public class MainActivity extends AppCompatActivity {
+    private AccessTokenViewModel accessTokenViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +32,11 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
 
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        String defaultAccessKey = "";
-        String accessKey = sharedPreferences.getString(getString(R.string.access_token_key), defaultAccessKey);
+        accessTokenViewModel = new ViewModelProvider(this).get(AccessTokenViewModel.class);
 
-        if (accessKey != "") {
-            Log.d("main", "onCreate: ok");
+        String accessToken = accessTokenViewModel.getAccessToken().getValue().toString();
+
+        if (accessToken != "") {
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 

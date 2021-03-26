@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.orderbot.Request.RequestSingleton;
+import com.example.orderbot.ViewModel.AccessTokenViewModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,12 +39,17 @@ public class LoginFragment extends Fragment {
 
     private JsonObjectRequest jsonObjectRequest;
 
-    public LoginFragment() {}
+    private AccessTokenViewModel accessTokenViewModel;
+
+    public LoginFragment() {
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_login, container, false);
+
+        accessTokenViewModel = new ViewModelProvider(requireActivity()).get(AccessTokenViewModel.class);
 
         loginButton = rootView.findViewById(R.id.login_button);
         username = rootView.findViewById(R.id.usernameInput);
@@ -76,15 +83,17 @@ public class LoginFragment extends Fragment {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        Log.d("Login", "access_token " + response.get("access_token"));
 
                         // save access token to shared preferences
-                        Context context = getActivity();
-                        SharedPreferences sharedPreferences = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString(getString(R.string.access_token_key), response.get("access_token").toString());
-                        editor.apply();
+                        accessTokenViewModel.setAccessToken(response.get("access_token").toString());
                         // done
+
+                        // replace fragments
+                        getParentFragmentManager().beginTransaction()
+                                .setReorderingAllowed(true)
+                                .replace(R.id.main_content, AdminPanelFragment.class, null)
+                                .disallowAddToBackStack()
+                                .commit();
                     } catch (JSONException e) {
                         Toast.makeText(getContext(), "Server Error. Check Internet Connection.", Toast.LENGTH_LONG).show();
                         e.printStackTrace();
@@ -95,7 +104,7 @@ public class LoginFragment extends Fragment {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d("error", "error");
+//                    Log.d("error", "error");
                     Toast.makeText(getContext(), "Username or password was incorrect", Toast.LENGTH_LONG).show();
                     loginButton.setText("Login");
                 }
