@@ -22,8 +22,7 @@ public class TopbarFragment extends Fragment {
     private FragmentTopbarBinding binding;
     private AccessTokenViewModel accessTokenViewModel;
 
-    public TopbarFragment() {
-    }
+    public TopbarFragment() {}
 
     @Nullable
     @Override

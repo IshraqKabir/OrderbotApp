@@ -1,7 +1,5 @@
 package com.example.orderbot;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,15 +7,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -25,21 +19,18 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.orderbot.Request.RequestSingleton;
 import com.example.orderbot.ViewModel.AccessTokenViewModel;
+import com.example.orderbot.databinding.FragmentLoginBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class LoginFragment extends Fragment {
-    private View rootView;
-    private Button loginButton;
-    private EditText username, password;
-
     private JsonObjectRequest jsonObjectRequest;
 
     private AccessTokenViewModel accessTokenViewModel;
+    private FragmentLoginBinding binding;
 
     public LoginFragment() {
     }
@@ -47,35 +38,31 @@ public class LoginFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_login, container, false);
+        binding = FragmentLoginBinding.inflate(getLayoutInflater());
 
         accessTokenViewModel = new ViewModelProvider(requireActivity()).get(AccessTokenViewModel.class);
 
-        loginButton = rootView.findViewById(R.id.login_button);
-        username = rootView.findViewById(R.id.usernameInput);
-        password = rootView.findViewById(R.id.passwordInput);
-
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        binding.loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 login();
             }
         });
 
-        return rootView;
+        return binding.getRoot();
     }
 
     private void login() {
-        if (username.getText().toString().isEmpty() || password.getText().toString().isEmpty()) {
+        if (binding.usernameInput.getText().toString().isEmpty() || binding.passwordInput.getText().toString().isEmpty()) {
             Toast.makeText(getActivity(), "Please fill in username and password", Toast.LENGTH_SHORT).show();
         } else {
-            loginButton.setText("Login in...");
+            binding.loginButton.setText("Login in...");
 
             HashMap<String, String> params = new HashMap<>();
-            params.put("username", username.getText().toString());
-            params.put("password", password.getText().toString());
+            params.put("username", binding.usernameInput.getText().toString());
+            params.put("password", binding.passwordInput.getText().toString());
 
-            String url = "https://orderbot.online/api/auth/login";
+            String url = Settings.domain + "/api/auth/login";
 
             RequestQueue queue = RequestSingleton.getInstance(getContext()).getRequestQueue();
 
@@ -99,14 +86,13 @@ public class LoginFragment extends Fragment {
                         e.printStackTrace();
                     }
 
-                    loginButton.setText("Login");
+                    binding.loginButton.setText("Login");
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-//                    Log.d("error", "error");
                     Toast.makeText(getContext(), "Username or password was incorrect", Toast.LENGTH_LONG).show();
-                    loginButton.setText("Login");
+                    binding.loginButton.setText("Login");
                 }
             });
 
