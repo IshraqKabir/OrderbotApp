@@ -16,6 +16,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.example.orderbot.Model.Card;
+import com.example.orderbot.Model.Item;
 import com.example.orderbot.Request.RequestSingleton;
 import com.example.orderbot.Settings;
 
@@ -77,22 +78,43 @@ public class AdminPanelViewModel extends AndroidViewModel {
 
                 setIsLoading(false);
 
-                List<Card> cards = new ArrayList<>();
+                List<Card> cardsList = new ArrayList<>();
 
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         Log.d(TAG, "name: " + response.getJSONObject(i).get("items").toString());
-//                        JSONObject cardObject = response.getJSONObject(i);
-//
-//                        Card card = new Card();
-//
-//                        card.setName(cardObject.get("name").toString());
-//                        card.setAbout(cardObject.get("about").toString());
-//                        card.setId(Integer.parseInt(cardObject.get("id").toString()));
+                        JSONObject cardObject = response.getJSONObject(i);
+
+                        Card card = new Card();
+
+                        card.setName(cardObject.get("name").toString());
+                        card.setAbout(cardObject.get("about").toString());
+                        card.setId(Integer.parseInt(cardObject.get("id").toString()));
+                        card.setImage(cardObject.get("image_link").toString());
+                        card.setCategory(cardObject.get("category").toString());
+
+                        List<Item> items = new ArrayList<>();
+
+                        for (int j = 0; j < cardObject.getJSONArray("items").length(); j++) {
+                            JSONObject itemObject = cardObject.getJSONArray("items").getJSONObject(i);
+
+                            Item item = new Item();
+                            item.setCardID(card.getId());
+                            item.setId(Integer.parseInt(itemObject.get("id").toString()));
+                            item.setQuantity(Integer.parseInt(itemObject.get("quantity").toString()));
+                            item.setPrice(Integer.parseInt(itemObject.get("price").toString()));
+                            item.setCategoryID(Integer.parseInt(itemObject.get("category_id").toString()));
+
+                            items.add(item);
+                        }
+
+                        cardsList.add(card);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
+
+                cards.setValue(cardsList);
             }
         }, new Response.ErrorListener() {
             @Override

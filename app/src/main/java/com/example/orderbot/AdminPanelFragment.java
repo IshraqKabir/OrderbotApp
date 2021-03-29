@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,8 @@ public class AdminPanelFragment extends Fragment {
     private FragmentAdminPanelBinding binding;
     private AccessTokenViewModel accessTokenViewModel;
     private AdminPanelViewModel adminPanelViewModel;
+
+    private final String TAG = AdminPanelFragment.class.getSimpleName();
 
     public AdminPanelFragment() {
     }
@@ -46,6 +49,10 @@ public class AdminPanelFragment extends Fragment {
                         .disallowAddToBackStack()
                         .commit();
             }
+        });
+
+        adminPanelViewModel.getCards(accessTokenViewModel.getAccessToken().getValue()).observe(getViewLifecycleOwner(), cards -> {
+            Log.d("change", "cards has changed" + cards.toString());
         });
 
         return binding.getRoot();
