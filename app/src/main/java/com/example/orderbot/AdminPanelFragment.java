@@ -52,7 +52,9 @@ public class AdminPanelFragment extends Fragment {
         });
 
         adminPanelViewModel.getCards(accessTokenViewModel.getAccessToken().getValue()).observe(getViewLifecycleOwner(), cards -> {
-            Log.d("change", "cards has changed" + cards.toString());
+            if (cards != null) {
+                Log.d("change", "cards has changed to length: " + cards.size());
+            }
         });
 
         return binding.getRoot();

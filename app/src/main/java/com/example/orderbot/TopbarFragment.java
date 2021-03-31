@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.orderbot.ViewModel.AccessTokenViewModel;
+import com.example.orderbot.ViewModel.AdminPanelViewModel;
 import com.example.orderbot.databinding.FragmentTopbarBinding;
 
 public class TopbarFragment extends Fragment {
@@ -21,6 +22,7 @@ public class TopbarFragment extends Fragment {
 
     private FragmentTopbarBinding binding;
     private AccessTokenViewModel accessTokenViewModel;
+    private AdminPanelViewModel adminPanelViewModel;
 
     public TopbarFragment() {}
 
@@ -31,6 +33,7 @@ public class TopbarFragment extends Fragment {
         rootView = binding.getRoot();
 
         accessTokenViewModel = new ViewModelProvider(requireActivity()).get(AccessTokenViewModel.class);
+        adminPanelViewModel = new ViewModelProvider(requireActivity()).get(AdminPanelViewModel.class);
 
         accessTokenViewModel.getAccessToken().observe(getViewLifecycleOwner(), accessToken -> {
             if (accessToken == "") {
@@ -44,6 +47,7 @@ public class TopbarFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 accessTokenViewModel.setAccessToken("");
+                adminPanelViewModel.reset();
 
                 // replace fragments
                 getParentFragmentManager().beginTransaction()
@@ -51,6 +55,7 @@ public class TopbarFragment extends Fragment {
                         .replace(R.id.main_content, LoginFragment.class, null)
                         .disallowAddToBackStack()
                         .commit();
+
             }
         });
 

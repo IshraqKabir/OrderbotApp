@@ -15,6 +15,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.example.orderbot.AllCardsFragment;
 import com.example.orderbot.Model.Card;
 import com.example.orderbot.Model.Item;
 import com.example.orderbot.Request.RequestSingleton;
@@ -58,11 +59,12 @@ public class AdminPanelViewModel extends AndroidViewModel {
             cards = new MutableLiveData<List<Card>>();
             this.loadCards(accessToken);
         }
+
         return cards;
     }
 
-    public void setCards(MutableLiveData<List<Card>> cards) {
-        this.cards = cards;
+    public void setCards(List<Card> cards) {
+        this.cards.setValue(cards);
     }
 
     public void loadCards(String accessToken) {
@@ -136,5 +138,11 @@ public class AdminPanelViewModel extends AndroidViewModel {
         };
 
         RequestSingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
+    }
+
+    public void reset() {
+        cards = null;
+        isLoading.setValue(true);
+        Log.d(TAG, "cards: " + cards);
     }
 }
